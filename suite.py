@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# =============================================================================
-# {}
-# []
-# =============================================================================
+"""
+email: romaindespoul@gmail.com
+github: https://github.com/wolf75222/Math_Term_Python/blob/main/suite.py
+"""
 
 # =============================================================================
 import inspect
@@ -14,108 +13,150 @@ import matplotlib.pyplot as plt
 
 class Suite(object):
 
-    def __init__(self, val0=2, f=lambda x: x+2):
+    def __init__(self, nom="u"):
         """
+        -------
         Une classe abstraite de Suite
-
-        Parameters
-        ----------
-        val0 : float
-            La valeur en 0. The default is 2.
-        f : function
-            La focntion qui renvoie l'image de x tel que Un+1=f(Un) The default is lambda(x: x+2).
-
-        Returns
-        -------
-        None.
-
         """
-        self.val0 = val0
-        self.f = f
+        self.nom = nom
 
-    def __call__(self, n):
-        """
-        Parameters
-        ----------
-        n : int
-            le rang
-
-        Returns
-        -------
-        res : float
-            la valeur de la suite en n
-
-        """
-        res = self.val0
-        for k in range(n):
-            res = self.f(res)
-        return res
-
-    def construitGraphique(self):
+    def __call__(self):
         """
         -------
-        Construit un graphique des 100 premiers termes de la suite
+        """
+        raise NotImplementedError
 
+    def __str__(self):
+        """
+        -------
+        """
+        raise NotImplementedError
+
+    def afficheGraphique(self):
+        """
+        -------
+        Affiche un graphique des 100 premiers termes de la suite
         """
         lm = [m for m in range(100)]
         lc = [self(m) for m in lm]
         plt.plot(lm, lc, ".")
-        plt.title(f"{self}")
+        plt.title(f"{self.nom}")
+        plt.show()
 
-    def renvoieRang(self, val):
+    def rang(self, val, nMax=10000):
         """
-
-        Parameters
-        ----------
-        val : float
-            la valeur en n
-
-        Returns
         -------
-        n : int
-            le rang ou on trouve val
-
+        le rang où on trouve val
         """
         n = 0
         while self(n) != val:
             n += 1
+            if n > nMax:
+                return -1
         return n
+
+
+class SuiteRec(Suite):
+
+    def __init__(self, nom, val0=2, f=lambda x: x+2):
+        """
+        -------
+        Une classe de Suite récurrente
+        * Un+1 = f(Un) : suite définie par récurrence
+        (on donne la fonction f et le premier terme)
+        """
+        super().__init__(nom)
+        self.f = f
+        self.dVal = dict()
+        self.dVal[0] = val0
+
+    def __call__(self, n):
+        """
+        a>>> u(2)
+        7
+
+        -------
+        La valeur de la suite en n
+        """
+        res = self.dVal[0]
+        if n in self.dVal.keys():
+            res = self.dVal[n]
+            print(res)
+            print(self.dVal)
+            return res
+        else:
+            for i in range(n):
+                res = self.f(res)
+                self.dVal[i] = res
+                print(res)
+                print(self.dVal)
+                return res
+
+    def rang(self, val, nMax):
+        """
+        -------
+        """
+        pass
 
     def __repr__(self):
         """
-        Returns
+        >>> u
+        SuiteRec("u", 1, lambda x: x+3)
+
         -------
-        s : String
-            repr() retourne une représentation sous forme de chaîne de caractères imprimable de l'objet passé.
+        retourne une représentation sous forme de chaîne de caractères imprimable de l'objet passé.
         """
         return str(inspect.getsourcelines(self.f)[0]).strip("['\\n']").split(" = ")[1]
 
     def __str__(self):
         """
-        Returns
         -------
-            str() retourne une représentation sous forme de chaîne de caractères imprimable de l'objet passé.
         """
-        return f"Val0 = {self.val0} f = {self.f}"
-
-    def __eq__(self, other):
-        return self.val0 == other.val0 and self.f == other.f
-
-    def __add__(self, other):
-        if self.val0 < other.val0:
-            x = self.val0
-        else:
-            x = other.val0
-        y = self.f + other.f
-        return Suite(x, y)
+        pass
 
 
-# =============================================================================
-# Test __call__
-u = Suite(1, lambda x: x+3)
-assert u(2) == 7
-# Test __repr__
-# assert u == "Suite(1, lambda x: x+3)" ??
+class SuiteFn(Suite):
+
+    def __init__(self, nom, f=lambda n: n+3):
+        """
+        -------
+        Une classe de suite tel que:
+        * Un= f(n) : suite définie par son terme général
+        (on donne la fonction f)
+        """
+        super().__init__(nom)
+        self.f = f
+
+    def __call__(self, n):
+        """
+        -------
+        La valeur de la suite en n
+        """
+        pass
+
+    def rang(self, val, nMax):
+        """
+        -------
+        """
+        pass
+
+    def __repr__(self):
+        """
+        -------
+        retourne une représentation sous forme de chaîne de caractères imprimable de l'objet passé.
+        """
+        return str(inspect.getsourcelines(self.f)[0]).strip("['\\n']").split(" = ")[1]
+
+    def __str__(self):
+        """
+        -------
+        """
+        pass
 
 
-# =============================================================================
+if __name__ == "__main__":
+    u = SuiteRec("u", 1, lambda x: x+3)
+    import doctest
+    doctest.testmod()
+    u(2)
+    u(2)
